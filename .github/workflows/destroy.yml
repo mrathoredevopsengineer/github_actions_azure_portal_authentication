@@ -1,25 +1,21 @@
-name: Deploy Terraform to Azure
+name: Destroy Terraform Infrastructure
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_dispatch: # Only manual run to prevent accidental destroy
 
 permissions:
   id-token: write
   contents: read
 
 env:
-  # Azure Authentication credentials stored as GitHub Repository Secrets
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   ARM_USE_OIDC: true
 
 jobs:
-  terraform:
-    name: Terraform Deploy
+  terraform-destroy:
+    name: Terraform Destroy
     runs-on: ubuntu-latest
 
     steps:
@@ -41,8 +37,8 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
-      - name: Terraform Plan
-        run: terraform plan -no-color
+      - name: Terraform Plan (Destroy)
+        run: terraform plan -destroy -no-color
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -no-color
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve -no-color
